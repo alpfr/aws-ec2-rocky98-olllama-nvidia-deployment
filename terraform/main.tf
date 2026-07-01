@@ -105,7 +105,7 @@ resource "aws_instance" "gpu_instance" {
   }
 
   # Inject automated setup script
-  user_data = file("${path.module}/bluegreen-validation.sh")
+  user_data = file("${path.module}/../scripts/bluegreen-validation.sh")
 
   tags = {
     Name = "rocky-gpu-ollama-instance"
