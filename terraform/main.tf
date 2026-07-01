@@ -63,8 +63,8 @@ resource "aws_security_group" "instance" {
   # Ollama API Access
   ingress {
     description = "Allow Ollama API from anywhere"
-    from_port   = 8503
-    to_port     = 8503
+    from_port   = 8502
+    to_port     = 8502
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"] # For production, restrict to trusted IPs
   }
@@ -103,6 +103,8 @@ resource "aws_instance" "gpu_instance" {
     volume_size           = var.volume_size
     delete_on_termination = true
   }
+
+  user_data_replace_on_change = true
 
   # Inject automated setup script
   # We prepend appsuser creation since the standalone script assumes the user already exists.

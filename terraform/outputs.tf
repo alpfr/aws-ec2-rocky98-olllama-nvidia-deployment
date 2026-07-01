@@ -17,12 +17,12 @@ output "ssh_command" {
 }
 
 output "ollama_endpoint" {
-  value       = "http://${aws_instance.gpu_instance.public_ip}:8503"
+  value       = "http://${aws_instance.gpu_instance.public_ip}:8502"
   description = "The endpoint URL for the Ollama API"
 }
 
 output "ollama_test_command" {
-  value       = "curl http://${aws_instance.gpu_instance.public_ip}:8503/api/tags"
+  value       = "curl http://${aws_instance.gpu_instance.public_ip}:8502/api/tags"
   description = "Command to verify if Ollama is running and accessible externally"
 }
 

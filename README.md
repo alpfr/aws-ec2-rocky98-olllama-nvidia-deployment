@@ -71,7 +71,7 @@ The `bluegreen-validation.sh` script automates:
 * Installation of matching **kernel headers**, development tools, and DKMS.
 * Configuration of official **NVIDIA CUDA repository** & installation of drivers and CUDA Toolkit.
 * Installation of the **NVIDIA Container Toolkit** and registration of the runtime with Docker.
-* Setup of **Ollama** running on custom port `8503` under models path `/data/apps/ollama/models`.
+* Setup of **Ollama** running on custom port `8502` under models path `/data/apps/ollama/models`.
 * Shell profile updates for `root` and `appsuser` with CUDA and Ollama environment variables.
 * Multi-point health validations (GPU, CUDA, Docker, User Access, Ollama API, and a GPU-accelerated model validation run).
 * Generates a final JSON summary report at `/var/log/bluegreen-validation-summary.json`.

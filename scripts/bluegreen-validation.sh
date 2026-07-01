@@ -8,7 +8,7 @@ export HOME=/root
 
 APP_USER="appsuser"
 
-OLLAMA_PORT=8503
+OLLAMA_PORT=8502
 OLLAMA_SERVICE_HOST="0.0.0.0:${OLLAMA_PORT}"
 OLLAMA_CLIENT_HOST="http://127.0.0.1:${OLLAMA_PORT}"
 OLLAMA_MODELS="/data/apps/ollama/models"
