@@ -232,14 +232,16 @@ export OLLAMA_MODELS=${OLLAMA_MODELS}
 # END MANAGED GPU/OLLAMA ENVIRONMENT
 "
 
-  for profile in /root/.bashrc "/home/${APP_USER}/.bashrc"; do
-    [[ -f "${profile}" ]] || fail "${profile} missing"
+  for profile in /root/.bashrc "/home/${APP_USER}/.bashrc" "/home/rocky/.bashrc"; do
+    [[ -f "${profile}" ]] || continue
 
     sed -i '/# BEGIN MANAGED GPU\/OLLAMA ENVIRONMENT/,/# END MANAGED GPU\/OLLAMA ENVIRONMENT/d' "${profile}"
     printf "\n%s\n" "${bash_block}" >> "${profile}"
-  done
 
-  chown "${APP_USER}:${APP_USER}" "/home/${APP_USER}/.bashrc"
+    local owner
+    owner=$(stat -c "%U:%G" "$(dirname "${profile}")")
+    chown "${owner}" "${profile}"
+  done
 }
 
 validate_gpu() {
