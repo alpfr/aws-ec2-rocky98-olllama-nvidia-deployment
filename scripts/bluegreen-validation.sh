@@ -42,10 +42,6 @@ init_log() {
   : > "${LOG_FILE}"
 }
 
-create_appsuser() {
-  log "Creating application user ${APP_USER}..."
-  id "${APP_USER}" >/dev/null 2>&1 || useradd -m "${APP_USER}"
-}
 
 install_base_packages() {
   log "Installing base packages..."
@@ -487,7 +483,6 @@ main() {
 
   log "Starting Rocky Linux 9.8 GPU blue/green bootstrap and validation"
 
-  create_appsuser
   install_base_packages
   install_nvidia_gpu_drivers
 

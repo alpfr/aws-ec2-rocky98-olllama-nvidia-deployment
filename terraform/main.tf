@@ -105,7 +105,12 @@ resource "aws_instance" "gpu_instance" {
   }
 
   # Inject automated setup script
-  user_data = file("${path.module}/../scripts/bluegreen-validation.sh")
+  # We prepend appsuser creation since the standalone script assumes the user already exists.
+  user_data = join("\n", [
+    "#!/bin/bash",
+    "id \"appsuser\" >/dev/null 2>&1 || useradd -m appsuser",
+    file("${path.module}/../scripts/bluegreen-validation.sh")
+  ])
 
   tags = {
     Name = "rocky-gpu-ollama-instance"
