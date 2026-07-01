@@ -223,7 +223,7 @@ update_shell_profiles() {
 # BEGIN MANAGED GPU/OLLAMA ENVIRONMENT
 export CUDA_HOME=${cuda_home}
 export CUDA_PATH=${cuda_home}
-export PATH=\${CUDA_HOME}/bin:\${PATH}
+export PATH=\${CUDA_HOME}/bin:/usr/local/bin:/usr/bin:/usr/sbin:\${PATH}
 export LD_LIBRARY_PATH=/usr/lib64:\${CUDA_HOME}/lib64:\${LD_LIBRARY_PATH:-}
 
 export OLLAMA_HOST=${OLLAMA_CLIENT_HOST}
