@@ -102,7 +102,7 @@ install_docker_compose_github() {
     "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-${compose_arch}" \
     -o /usr/local/bin/docker-compose
 
-  chmod +x /usr/local/bin/docker-compose
+  chmod 755 /usr/local/bin/docker-compose
   ln -sf /usr/local/bin/docker-compose /usr/bin/docker-compose
 
   docker-compose version | tee -a "${LOG_FILE}"
@@ -309,6 +309,9 @@ validate_appsuser() {
 
   su - "${APP_USER}" -c "OLLAMA_HOST=${OLLAMA_CLIENT_HOST} ollama list" >> "${LOG_FILE}" 2>&1 || \
     fail "${APP_USER} cannot run ollama list"
+
+  su - "${APP_USER}" -c "docker-compose version" >> "${LOG_FILE}" 2>&1 || \
+    fail "${APP_USER} cannot run docker-compose"
 
   log "${APP_USER} Docker, NVIDIA, and Ollama access validated"
 }
