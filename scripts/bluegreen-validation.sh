@@ -242,6 +242,27 @@ export OLLAMA_MODELS=${OLLAMA_MODELS}
     owner=$(stat -c "%U:%G" "$(dirname "${profile}")")
     chown "${owner}" "${profile}"
   done
+
+  # Write system-wide profile environment for all shells
+  local profile_file="/etc/profile.d/ollama.sh"
+  log "Creating system-wide profile environment at ${profile_file}..."
+  cat > "${profile_file}" <<EOF
+# System-wide GPU and Ollama configuration
+export CUDA_HOME=${cuda_home}
+export CUDA_PATH=${cuda_home}
+export PATH=\${CUDA_HOME}/bin:/usr/local/bin:/usr/bin:/usr/sbin:\${PATH}
+export LD_LIBRARY_PATH=/usr/lib64:\${CUDA_HOME}/lib64:\${LD_LIBRARY_PATH:-}
+
+export OLLAMA_HOST=${OLLAMA_CLIENT_HOST}
+export OLLAMA_PORT=${OLLAMA_PORT}
+export OLLAMA_MODELS=${OLLAMA_MODELS}
+EOF
+  chmod 644 "${profile_file}"
+
+  # Configure sudo to preserve Ollama environment variables
+  log "Configuring sudo to preserve Ollama environment variables..."
+  echo 'Defaults env_keep += "OLLAMA_HOST OLLAMA_PORT"' > /etc/sudoers.d/ollama
+  chmod 440 /etc/sudoers.d/ollama
 }
 
 validate_gpu() {
