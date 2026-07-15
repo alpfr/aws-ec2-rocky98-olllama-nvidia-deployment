@@ -108,6 +108,30 @@ install_docker_compose_github() {
   docker-compose version | tee -a "${LOG_FILE}"
 }
 
+install_kubectl() {
+  log "Installing kubectl..."
+
+  if ! command -v kubectl >/dev/null 2>&1; then
+    local arch k8s_arch
+    arch="$(uname -m)"
+    case "${arch}" in
+      x86_64) k8s_arch="amd64" ;;
+      aarch64|arm64) k8s_arch="arm64" ;;
+      *) fail "Unsupported architecture for kubectl: ${arch}" ;;
+    esac
+
+    local stable_ver
+    stable_ver="$(curl -L -s https://dl.k8s.io/release/stable.txt)"
+    curl -fsSL "https://dl.k8s.io/release/${stable_ver}/bin/linux/${k8s_arch}/kubectl" -o /usr/local/bin/kubectl
+    chmod 755 /usr/local/bin/kubectl
+    ln -sf /usr/local/bin/kubectl /usr/bin/kubectl
+
+    log "Installed kubectl: $(kubectl version --client --output=yaml | grep gitVersion || true)"
+  else
+    log "kubectl already installed: $(kubectl version --client --output=yaml | grep gitVersion || true)"
+  fi
+}
+
 configure_docker() {
   log "Configuring Docker data-root..."
 
@@ -314,6 +338,13 @@ validate_docker() {
   docker run --rm hello-world >> "${LOG_FILE}" 2>&1 || fail "Docker hello-world test failed"
 }
 
+validate_kubectl() {
+  log "===== KUBECTL VALIDATION ====="
+  command -v kubectl >/dev/null || fail "kubectl not found in PATH"
+  kubectl version --client >> "${LOG_FILE}" || fail "kubectl client version command failed"
+  log "kubectl validation successful"
+}
+
 validate_appsuser() {
   log "===== APPSUSER VALIDATION ====="
 
@@ -333,6 +364,9 @@ validate_appsuser() {
 
   su - "${APP_USER}" -c "docker-compose version" >> "${LOG_FILE}" 2>&1 || \
     fail "${APP_USER} cannot run docker-compose"
+
+  su - "${APP_USER}" -c "kubectl version --client" >> "${LOG_FILE}" 2>&1 || \
+    fail "${APP_USER} cannot run kubectl"
 
   log "${APP_USER} Docker, NVIDIA, and Ollama access validated"
 }
@@ -465,10 +499,14 @@ validation_summary() {
   cuda_home="$(grep '^export CUDA_HOME=' /root/.bashrc | tail -1 | cut -d= -f2 || echo unknown)"
   model_count="$(OLLAMA_HOST="${OLLAMA_CLIENT_HOST}" ollama list 2>/dev/null | tail -n +2 | wc -l || echo 0)"
 
+  local kubectl_version
+  kubectl_version="$(kubectl version --client --output=json 2>/dev/null | grep -oP '"gitVersion":\s*"\K[^"]+' || echo unknown)"
+
   log "GPU                : ${gpu_name}"
   log "Driver             : ${driver_version}"
   log "Docker RootDir     : ${docker_root}"
   log "Docker Compose     : ${compose_version}"
+  log "kubectl            : ${kubectl_version}"
   log "Apps User          : ${APP_USER}"
   log "Ollama Port        : ${OLLAMA_PORT}"
   log "Ollama Service Host: ${OLLAMA_SERVICE_HOST}"
@@ -489,6 +527,7 @@ validation_summary() {
   "driver": "${driver_version}",
   "docker_root": "${docker_root}",
   "docker_compose": "${compose_version}",
+  "kubectl": "${kubectl_version}",
   "apps_user": "${APP_USER}",
   "ollama_port": ${OLLAMA_PORT},
   "ollama_service_host": "${OLLAMA_SERVICE_HOST}",
@@ -515,6 +554,7 @@ main() {
   install_docker
   install_nvidia_container_toolkit
   install_docker_compose_github
+  install_kubectl
   configure_docker
 
   install_ollama
@@ -526,6 +566,7 @@ main() {
   validate_gpu
   validate_cuda
   validate_docker
+  validate_kubectl
   validate_appsuser
   validate_ollama
   validate_ollama_model_gpu_run

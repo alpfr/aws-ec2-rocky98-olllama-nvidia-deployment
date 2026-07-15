@@ -72,6 +72,7 @@ The `bluegreen-validation.sh` script automates:
 * Configuration of official **NVIDIA CUDA repository** & installation of drivers and CUDA Toolkit.
 * Installation of the **NVIDIA Container Toolkit** and registration of the runtime with Docker.
 * Setup of **Ollama** running on custom port `8502` under models path `/data/apps/ollama/models`.
+* Installation of the **Kubernetes CLI (`kubectl`)** binary based on system architecture.
 * Shell profile updates for `root`, `rocky`, and `appsuser` with CUDA and Ollama environment variables, plus system-wide configuration via `/etc/profile.d/ollama.sh` to ensure port `8502` is targeted automatically.
 * Sudo environment preservation settings in `/etc/sudoers.d/ollama` so that calling `sudo ollama <command>` preserves user environment configurations (avoiding connection errors to default port `11434`).
 * Multi-point health validations (GPU, CUDA, Docker, User Access, Ollama API, and a GPU-accelerated model validation run).
